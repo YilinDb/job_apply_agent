@@ -1,0 +1,83 @@
+{
+  // Identity & contact
+  "FIRST_NAME": "",            // Legal first name
+  "LAST_NAME": "",             // Legal last name
+  "PREFERRED_NAME": "",        // Preferred name (if different)
+  "EMAIL": "",                 // Primary email
+  "DATE_OF_BIRTH": "",         // Format: Month Day, Year (e.g., 01/15/1990)
+  "PHONE": "",                 // Primary phone number (e.g., 4155550123)
+  "PHONE_AREA": "",            // Country/region label (e.g., United States)
+
+  // Address
+  "LOCATION": "",              // City, State, Country
+  "ADDRESS_LINE1": "",         // Street address line 1
+  "ADDRESS_LINE2": "",         // Street address line 2 (city/state if you use this format)
+  "ADDRESS_LINE3": "",         // Optional extra line
+  "POSTAL_CODE": "",           // ZIP/postal code
+
+  // Demographics & eligibility
+  "ETHNICITY": "",             // Asian / African American / Hispanic / White / Two or more races / Native American / Pacific Islander / Prefer not to say
+  "WORK_AUTH_US": "",          // Yes/No
+  "WORK_AUTH_CANADA": "",      // Yes/No
+  "WORK_AUTH_UK": "",          // Yes/No
+  "NEED_VISA_SPONSORSHIP": "", // Yes/No
+  "HAS_DISABILITY": "",        // Yes/No/Prefer not to say
+  "IDENTIFIES_LGBTQ": "",      // Yes/No/Prefer not to say
+  "GENDER": "",                // Male / Female / Non-binary / Prefer not to say
+  "VETERAN": "",               // Yes/No/Prefer not to say
+
+  // Profile content
+  "WORK_EXPERIENCE": [           // List of roles (company, role, location, start, end, employment_type, bullets)
+    {
+      "company": "Example Corp",
+      "role": "Software Engineer",
+      "location": "City, State",
+      "start": "Jan 2023",
+      "end": "Present",
+      "employment_type": "Full-Time",
+      "bullets": [
+        "Built feature X that improved metric Y by Z%",
+        "Automated process A to reduce time by N hours/week"
+      ]
+    }
+  ],
+  "EDUCATION": [                 // List of schools (school, location, start, end, degree, major, gpa)
+    {
+      "school": "Example University",
+      "location": "City, State",
+      "start": "Aug 2019",
+      "end": "May 2023",
+      "degree": "Bachelor of Science",
+      "major": "Computer Science",
+      "gpa": "3.8"
+    }
+  ],
+  "PROJECTS": [                  // List of projects (title, role, location, start, end, bullets)
+    {
+      "title": "Sample Project",
+      "role": "Contributor",
+      "location": "Remote",
+      "start": "Jun 2022",
+      "end": "Aug 2022",
+      "bullets": [
+        "Implemented feature A using tech B",
+        "Reduced latency by 30% with optimization C"
+      ]
+    }
+  ],
+  "LINKS": {                     // Object of links (e.g., linkedin, github, portfolio)
+    "linkedin": "https://www.linkedin.com/in/your-handle",
+    "github": "https://github.com/your-handle",
+    "portfolio": "https://your-site.com",
+    "other": ""
+  },
+  "SKILLS": [                    // List of skills/keywords
+    "Python",
+    "SQL",
+    "AWS"
+  ],
+  "LANGUAGES": [                 // List of languages
+    "English",
+    "Spanish"
+  ]
+}

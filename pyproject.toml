@@ -1,0 +1,16 @@
+[project]
+name = "apply-agent"
+version = "0.1.0"
+description = "Browser Use agent workspace"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "browser-use==0.11.5",
+  "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+  "pre-commit",
+  "ruff",
+  "mypy",
+]
