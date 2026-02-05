@@ -39,6 +39,23 @@ private/
 
 Use `profile.example.jsonc` (repo root) as a template for `private/profile.json`.
 
+## 3.1) Prepare a non-default Chrome profile (required)
+Chrome blocks DevTools/automation on the default user data directory. You must create a non-default profile and log in once.
+
+Windows (PowerShell):
+```powershell
+$src="$env:LOCALAPPDATA\Google\Chrome\User Data"; $dst="$env:LOCALAPPDATA\ChromeProfile20-CDP"; Remove-Item -Recurse -Force $dst -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Force $dst | Out-Null; Copy-Item -Recurse -Force "$src\Profile 20" "$dst\Profile 20"; Copy-Item -Force "$src\Local State" "$dst\Local State"
+```
+
+Then launch Chrome using the copied profile and log in once:
+```powershell
+& "C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="$env:LOCALAPPDATA\ChromeProfile20-CDP" --profile-directory="Profile 20"
+```
+
+Update `.env`:
+- `CHROME_USER_DATA_DIR` → `C:\Users\<you>\AppData\Local\ChromeProfile20-CDP`
+- `CHROME_PROFILE_DIR` → `Profile 20`
+
 ## 4) Fill in `.env`
 Required:
 - `PROFILE_JSON_PATH` → path to `private/profile.json`
