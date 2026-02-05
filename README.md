@@ -1,6 +1,6 @@
 # Apply Agent
 
-Automate LinkedIn Easy Apply using Browser Use. This repo is OS-agnostic and configured with `.env` + `private/` data.
+Automate LinkedIn Job Apply using Browser Use. This repo is OS-agnostic and configured with `.env` + `private/` data.
 
 ## 1) Requirements
 - Python 3.11
