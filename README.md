@@ -89,4 +89,3 @@ python run.py
 ## Notes
 - The script runs headful (`headless=False`).
 - `APPLY_NUMBER` controls how many jobs to attempt.
-- For best performance in production, use Browser Use Cloud: `LLM_PROVIDER=browser_use` + `BROWSER_USE_API_KEY`.
