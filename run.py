@@ -33,7 +33,7 @@ class Settings(BaseModel):
     resume_pdf_path: Path = Field(alias="RESUME_PDF_PATH")
     apply_number: int = Field(default=1, alias="APPLY_NUMBER")
     chrome_executable_path: str | None = Field(default=None, alias="CHROME_EXECUTABLE_PATH")
-    chrome_user_data_dir: str | None = Field(default=None, alias="CHROME_USER_DATA_DIR")
+    chrome_user_data_dir: str = Field(alias="CHROME_USER_DATA_DIR")
     chrome_profile_dir: str = Field(default="Default", alias="CHROME_PROFILE_DIR")
     llm_provider: str = Field(default="google", alias="LLM_PROVIDER")
     llm_model: str = Field(default="gemini-3-flash-preview", alias="LLM_MODEL")
@@ -62,6 +62,16 @@ class Settings(BaseModel):
     @classmethod
     def _apply_min(cls, value: int) -> int:
         return max(1, value)
+
+    @field_validator("chrome_user_data_dir")
+    @classmethod
+    def _chrome_user_data_dir_exists(cls, value: str) -> str:
+        path = Path(value).expanduser()
+        if not path.exists() or not path.is_dir():
+            raise FileNotFoundError(
+                "CHROME_USER_DATA_DIR is required and must point to an existing directory."
+            )
+        return str(path)
 
 
 class ApplyInfo(BaseModel):
@@ -157,16 +167,6 @@ def _default_chrome_paths() -> list[Path]:
     return paths
 
 
-def _default_user_data_dir() -> Path | None:
-    system = platform.system().lower()
-    if system == "windows":
-        local_app_data = os.environ.get("LOCALAPPDATA", "")
-        return Path(local_app_data) / "Google/Chrome/User Data"
-    if system == "darwin":
-        return Path.home() / "Library/Application Support/Google/Chrome"
-    return Path.home() / ".config/google-chrome"
-
-
 def _resolve_chrome_executable(explicit_path: str | None) -> str | None:
     if explicit_path:
         path = Path(explicit_path).expanduser()
@@ -178,13 +178,10 @@ def _resolve_chrome_executable(explicit_path: str | None) -> str | None:
 
 
 def _resolve_user_data_dir(explicit_path: str | None) -> str | None:
-    if explicit_path:
-        path = Path(explicit_path).expanduser()
-        return str(path) if path.exists() else None
-    path = _default_user_data_dir()
-    if path and path.exists():
-        return str(path)
-    return None
+    if not explicit_path:
+        return None
+    path = Path(explicit_path).expanduser()
+    return str(path) if path.exists() else None
 
 
 def _build_llm(provider: str, model: str):
@@ -216,7 +213,7 @@ async def main() -> None:
             "RESUME_PDF_PATH": _env("RESUME_PDF_PATH"),
             "APPLY_NUMBER": _env_int("APPLY_NUMBER", 1),
             "CHROME_EXECUTABLE_PATH": _env("CHROME_EXECUTABLE_PATH") or None,
-            "CHROME_USER_DATA_DIR": _env("CHROME_USER_DATA_DIR") or None,
+            "CHROME_USER_DATA_DIR": _env("CHROME_USER_DATA_DIR"),
             "CHROME_PROFILE_DIR": _env("CHROME_PROFILE_DIR", "Default"),
             "LLM_PROVIDER": _env("LLM_PROVIDER", "google"),
             "LLM_MODEL": _env("LLM_MODEL", "gemini-3-flash-preview"),
@@ -244,6 +241,9 @@ async def main() -> None:
     browser = Browser(browser_profile=browser_profile)
 
     llm = _build_llm(settings.llm_provider, settings.llm_model)
+    print(apply_info)
+    print(str(resume_file))
+    print(settings.apply_number)
     task = _build_task(apply_info, str(resume_file), settings.apply_number)
     agent = Agent(task=task, llm=llm, browser=browser, available_file_paths=available_files)
     await agent.run()
