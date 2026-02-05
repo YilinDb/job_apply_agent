@@ -29,6 +29,7 @@ def _format_value(value) -> str:
 
 
 class Settings(BaseModel):
+    profile_json_path: Path = Field(alias="PROFILE_JSON_PATH")
     resume_pdf_path: Path = Field(alias="RESUME_PDF_PATH")
     apply_number: int = Field(default=1, alias="APPLY_NUMBER")
     chrome_executable_path: str | None = Field(default=None, alias="CHROME_EXECUTABLE_PATH")
@@ -36,7 +37,16 @@ class Settings(BaseModel):
     chrome_profile_dir: str = Field(default="Default", alias="CHROME_PROFILE_DIR")
     llm_provider: str = Field(default="google", alias="LLM_PROVIDER")
     llm_model: str = Field(default="gemini-3-flash-preview", alias="LLM_MODEL")
-    cdp_url: str | None = Field(default=None, alias="CDP_URL")
+
+    @field_validator("profile_json_path")
+    @classmethod
+    def _profile_exists(cls, value: Path) -> Path:
+        path = value.expanduser()
+        if not path.exists() or not path.is_file() or path.suffix.lower() != ".json":
+            raise FileNotFoundError(
+                "PROFILE_JSON_PATH is required and must point to an existing JSON file."
+            )
+        return path
 
     @field_validator("resume_pdf_path")
     @classmethod
@@ -202,6 +212,7 @@ async def main() -> None:
 
     settings = Settings.model_validate(
         {
+            "PROFILE_JSON_PATH": _env("PROFILE_JSON_PATH", "private/profile.json"),
             "RESUME_PDF_PATH": _env("RESUME_PDF_PATH"),
             "APPLY_NUMBER": _env_int("APPLY_NUMBER", 1),
             "CHROME_EXECUTABLE_PATH": _env("CHROME_EXECUTABLE_PATH") or None,
@@ -209,12 +220,10 @@ async def main() -> None:
             "CHROME_PROFILE_DIR": _env("CHROME_PROFILE_DIR", "Default"),
             "LLM_PROVIDER": _env("LLM_PROVIDER", "google"),
             "LLM_MODEL": _env("LLM_MODEL", "gemini-3-flash-preview"),
-            "CDP_URL": _env("CDP_URL") or None,
         }
     )
 
-    profile_path = Path(_env("PROFILE_JSON_PATH", "private/profile.json")).expanduser()
-    apply_info = _load_profile(profile_path)
+    apply_info = _load_profile(settings.profile_json_path)
 
     resume_file = settings.resume_pdf_path
     available_files = [str(resume_file)]
@@ -232,10 +241,7 @@ async def main() -> None:
         profile_kwargs["profile_directory"] = profile_dir
 
     browser_profile = BrowserProfile(**profile_kwargs)
-    if settings.cdp_url:
-        browser = Browser(cdp_url=settings.cdp_url)
-    else:
-        browser = Browser(browser_profile=browser_profile)
+    browser = Browser(browser_profile=browser_profile)
 
     llm = _build_llm(settings.llm_provider, settings.llm_model)
     task = _build_task(apply_info, str(resume_file), settings.apply_number)
