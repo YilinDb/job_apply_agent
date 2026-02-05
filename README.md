@@ -40,21 +40,30 @@ private/
 Use `profile.example.jsonc` (repo root) as a template for `private/profile.json`.
 
 ## 3.1) Prepare a non-default Chrome profile (required)
-Chrome blocks DevTools/automation on the default user data directory. You must create a non-default profile and log in once.
+Chrome blocks DevTools/automation on the **default** user data directory. You must copy your profile to a **non-default** location and log in once.
 
-Windows (PowerShell):
-```powershell
-$src="$env:LOCALAPPDATA\Google\Chrome\User Data"; $dst="$env:LOCALAPPDATA\ChromeProfile20-CDP"; Remove-Item -Recurse -Force $dst -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Force $dst | Out-Null; Copy-Item -Recurse -Force "$src\Profile 20" "$dst\Profile 20"; Copy-Item -Force "$src\Local State" "$dst\Local State"
+Steps (generic):
+1) Find your Chrome user data directory (varies by OS/user).
+2) Pick the profile folder you want (often `Default` or `Profile 1`).
+3) Copy **that profile folder** and **Local State** into a new folder outside the default user data directory.
+4) Launch Chrome once using the copied profile and log in.
+5) Point `.env` to the copied profile:
+   - `CHROME_USER_DATA_DIR` → path to the **copied** user data directory
+   - `CHROME_PROFILE_DIR` → the profile folder name you copied
+
+Example (generic paths):
 ```
+# original user data dir:
+/path/to/Chrome/User Data
+# profile folder:
+Profile 1
+# copied user data dir:
+/path/to/ChromeProfile-CDP
 
-Then launch Chrome using the copied profile and log in once:
-```powershell
-& "C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="$env:LOCALAPPDATA\ChromeProfile20-CDP" --profile-directory="Profile 20"
+# .env
+CHROME_USER_DATA_DIR=/path/to/ChromeProfile-CDP
+CHROME_PROFILE_DIR=Profile 1
 ```
-
-Update `.env`:
-- `CHROME_USER_DATA_DIR` → `C:\Users\<you>\AppData\Local\ChromeProfile20-CDP`
-- `CHROME_PROFILE_DIR` → `Profile 20`
 
 ## 4) Fill in `.env`
 Required:
